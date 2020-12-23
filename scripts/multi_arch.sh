@@ -13,7 +13,7 @@ echo "|                                    |"
 echo "| Author    :   Daniel Carvalho      |"
 echo "| Version   :   1.0                  |"
 echo "+------------------------------------+"
-echo "\nMultiarch setup started...\n"
+printf "\nMultiarch setup started...\n"
 
 # get current working directory path
 cwd=$(pwd)
@@ -43,4 +43,4 @@ sudo docker run --rm --privileged multiarch/qemu-user-static:register --reset
 sudo cp $qemu_path $cwd
 
 # success message
-echo "Successfully setup QEMU...\n"
+printf "Successfully setup QEMU...\n"
