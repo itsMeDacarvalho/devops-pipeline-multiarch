@@ -10,7 +10,9 @@ Devops pipeline multiarch is a script that once added to a project to be consume
 As soon as you have your ``azure-pipelines.yml`` in place for your project, it is just a matter of adding a couple of lines. Simple as...
 
 1. Please add an extension to your ``Dockerfile`` that describes your architecture. Check the [supported architectures](#supported-architectures).
+
 2. Clone this repo and copy the ``scripts/`` folder to the root of your project repository.
+
 3. Copy the following code snippet as first task in your ``azure-pipelines.yml``:
 ```yaml
 # --------- MULTI-ARCH-SETUP ----------
@@ -20,6 +22,16 @@ As soon as you have your ``azure-pipelines.yml`` in place for your project, it i
     targetType: 'filePath'
     filePath: $(System.DefaultWorkingDirectory)/scripts/multi_arch.sh
 # ----- * --------- * --------- * -----  
+``` 
+4. Finnaly add this on top of your ``Dockerfile.xxxxx`` file:
+```docker
+FROM ...
+
+# Copy qemu-arm-static to /usr/bin and make it executable
+COPY qemu-arm-static /usr/bin
+RUN chmod +x /usr/bin/qemu-arm-static
+
+...
 ```
 
 
