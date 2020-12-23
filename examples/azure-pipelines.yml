@@ -1,0 +1,60 @@
+# --------- RUNNER-CONFIG ---------
+trigger:
+  - '*'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  version: "0.1"
+  environment: dev
+  platform: arm32v7
+  image_tag: $(version).$(Build.BuildId)-$(environment)-$(platform)
+
+steps:
+
+# --------- MULTI-ARCH-SETUP ---------
+- task: Bash@3
+  displayName: Setting QEMU from Dockerfile extension
+  inputs:
+    targetType: 'filePath'
+    filePath: $(System.DefaultWorkingDirectory)/scripts/multi_arch.sh
+
+# --------- DOCKER-ACTIONS ---------
+- task: Docker@2
+  displayName: Login to ACR
+  inputs:
+    command: login
+    containerRegistry: etib-acr
+
+- task: Docker@2
+  displayName: Build
+  inputs:
+    command: build
+    containerRegistry: etib-acr
+    repository: etib-edge-local-api
+    Dockerfile: $(System.DefaultWorkingDirectory)/Dockerfile.arm32v7
+    tags: |
+      $(image_tag)
+
+- task: Docker@2
+  displayName: Push
+  inputs:
+    command: push
+    containerRegistry: etib-acr
+    repository: etib-edge-local-api
+    tags: |
+      $(image_tag)
+
+- task: Docker@2
+  displayName: Logout of ACR
+  inputs:
+    command: logout
+    containerRegistry: etib-acr
+
+# --------- POST-HOUSEKEEPING ---------
+- task: Bash@3
+  displayName: Remove runner files
+  inputs:
+    targetType: 'inline'
+    script: 'rm -rf $(System.DefaultWorkingDirectory)/qemu-arm-static'
